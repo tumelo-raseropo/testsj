@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tumelo Raseropo | Executive Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.1.96/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #ff8f00;
+            --dark: #263238;
+            --light: #f5f5f5;
+            --executive: #0d47a1;
+            --luxury: #6a1b9a; /* New color for Luscious Allure */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .executive-nav {
+            background-color: var(--dark);
+            color: white;
+        }
+        
+        .executive-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .executive-sidebar {
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            height: 100vh;
+            position: fixed;
+            width: 280px;
+            overflow-y: auto;
+        }
+        
+        .executive-main {
+            margin-left: 280px;
+            padding: 20px;
+        }
+        
+        .executive-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .executive-card:hover {
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        
+        .nav-item-exec {
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .nav-item-exec:hover, .nav-item-exec.active {
+            background-color: rgba(13, 71, 161, 0.1);
+        }
+        
+        .nav-item-exec i {
+            width: 24px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        
+        .status-approved {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-rejected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-in-transit {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        #executive-map {
+            height: 300px;
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        .progress-exec {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        /* New styles for Luscious Allure */
+        .luxury-bg {
+            background-color: var(--luxury);
+        }
+        .luxury-badge {
+            background-color: rgba(106, 27, 154, 0.1);
+            color: var(--luxury);
+        }
+        
+        /* Settings panel */
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            z-index: 1050;
+            overflow-y: auto;
+        }
+        
+        /* Report templates */
+        .template-card {
+            border: 1px dashed #ccc;
+            cursor: pointer;
+        }
+        .template-card:hover {
+            border-color: var(--primary);
+        }
+        
+        @media (max-width: 992px) {
+            .executive-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .executive-main {
+                margin-left: 0;
+            }
+            
+            .settings-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark executive-nav">
+        <div class="container-fluid">
+            <a class="navbar-brand executive-brand" href="#">
+                <i class="mdi mdi-account-tie mdi-24px me-2"></i>
+                TR EXECUTIVE DASHBOARD
+            </a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="mdi mdi-bell-outline"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><a class="dropdown-item" href="#">New shipment from Limpopo</a></li>
+                        <li><a class="dropdown-item" href="#">Payment received from AFGRI</a></li>
+                        <li><a class="dropdown-item" href="#">Meeting with NEF at 2pm</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="avatar me-2">
+                        Tumelo Raseropo
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="showSettings()"><i class="mdi mdi-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="mdi mdi-logout me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="executive-sidebar p-3">
+        <div class="d-flex flex-column">
+            <div class="text-center mb-4 mt-2">
+                <img src="https://via.placeholder.com/150x50?text=TR+Group" alt="Logo" class="img-fluid" id="company-logo">
+            </div>
+            
+            <ul class="nav flex-column">
+                <li class="nav-item nav-item-exec active" data-page="dashboard">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-view-dashboard"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="shipments">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-truck-delivery"></i>
+                        Shipment Tracking
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="finance">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-finance"></i>
+                        Financial Overview
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="team">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-account-group"></i>
+                        Team Management
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="units">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-factory"></i>
+                        Business Units
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="luscious">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-bottle-tonic"></i>
+                        Luscious Allure
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="documents">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-file-document-multiple"></i>
+                        Contracts & Documents
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="accounting">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-calculator"></i>
+                        Accounting
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="reports">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-file-chart"></i>
+                        Reports
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="calendar">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-calendar-clock"></i>
+                        Executive Calendar
+                    </a>
+                </li>
+                <li class="nav-item nav-item-exec" data-page="comms">
+                    <a class="nav-link" href="#">
+                        <i class="mdi mdi-email"></i>
+                        Communications Hub
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="mt-auto">
+                <div class="card executive-card bg-light mt-4">
+                    <div class="card-body p-3">
+                        <h6 class="card-title">Quick Actions</h6>
+                        <button class="btn btn-sm btn-primary w-100 mb-2" onclick="showPage('luscious')">
+                            <i class="mdi mdi-plus"></i> New Cologne Batch
+                        </button>
+                        <button class="btn btn-sm btn-success w-100 mb-2" onclick="generateReport('invoice')">
+                            <i class="mdi mdi-email-fast"></i> Send Invoice
+                        </button>
+                        <button class="btn btn-sm btn-warning w-100" onclick="showPage('reports')">
+                            <i class="mdi mdi-file-chart"></i> Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="executive-main">
+        <!-- Dashboard Page (Default) -->
+        <div class="container-fluid" id="dashboard-page">
+            <!-- Welcome Card -->
+            <div class="card executive-card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="card-title">Good Morning, Tumelo</h2>
+                            <p class="card-text">Here's what's happening across your business portfolio today</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <p class="mb-1"><strong>Last Login:</strong> Today, 08:24 AM</p>
+                            <p class="mb-1"><strong>Current Location:</strong> Johannesburg HQ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Business Overview -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card executive-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">SJ Solutions</h6>
+                                    <h3 class="mb-0">R 284,750</h3>
+                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 12.5% this month</small>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                    <i class="mdi mdi-truck mdi-24px text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card executive-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Raseropo Fresh</h6>
+                                    <h3 class="mb-0">R 98,420</h3>
+                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 8.3% this month</small>
+                                </div>
+                                <div class="bg-success bg-opacity-10 p-3 rounded">
+                                    <i class="mdi mdi-sprout mdi-24px text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card executive-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Luscious Allure</h6>
+                                    <h3 class="mb-0">R 68,900</h3>
+                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 22.1% this month</small>
+                                    <small class="d-block mt-1">Agents: 14 | Bottles Sold: 275</small>
+                                </div>
+                                <div class="bg-danger bg-opacity-10 p-3 rounded">
+                                    <i class="mdi mdi-bottle-tonic-outline mdi-24px text-danger"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card executive-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Total Portfolio</h6>
+                                    <h3 class="mb-0">R 452,070</h3>
+                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 14.2% this month</small>
+                                </div>
+                                <div class="bg-info bg-opacity-10 p-3 rounded">
+                                    <i class="mdi mdi-chart-pie mdi-24px text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Active Shipments -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Active Shipments</h5>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Shipment ID</th>
+                                            <th>Product</th>
+                                            <th>Route</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#SJ-2305-142</td>
+                                            <td>White Maize (25T)</td>
+                                            <td>Limpopo → JHB</td>
+                                            <td><span class="status-badge status-in-transit">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="mdi mdi-map-marker-path"></i> Track
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#RF-2305-087</td>
+                                            <td>Baby Marrow (5T)</td>
+                                            <td>Farm → JHB Market</td>
+                                            <td><span class="status-badge status-pending">Pending Pickup</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-warning">
+                                                    <i class="mdi mdi-truck-delivery"></i> Dispatch
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#SJ-2305-143</td>
+                                            <td>Yellow Maize (50T)</td>
+                                            <td>NW → Durban Port</td>
+                                            <td><span class="status-badge status-approved">Loaded</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-success">
+                                                    <i class="mdi mdi-check-circle"></i> Verify
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#SJ-2305-144</td>
+                                            <td>White Maize (100T)</td>
+                                            <td>FS → Botswana</td>
+                                            <td><span class="status-badge status-pending">Documentation</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info">
+                                                    <i class="mdi mdi-file-document"></i> Process
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business Unit Performance -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Business Unit Performance</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        This Month
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#">Today</a></li>
+                                        <li><a class="dropdown-item" href="#">This Week</a></li>
+                                        <li><a class="dropdown-item" href="#">This Month</a></li>
+                                        <li><a class="dropdown-item" href="#">This Quarter</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>SJ Solutions</span>
+                                    <span>R 284,750 (63%)</span>
+                                </div>
+                                <div class="progress progress-exec">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 63%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Raseropo Fresh Produce</span>
+                                    <span>R 98,420 (22%)</span>
+                                </div>
+                                <div class="progress progress-exec">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 22%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Luscious Allure</span>
+                                    <span>R 68,900 (15%)</span>
+                                </div>
+                                <div class="progress progress-exec">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 15%"></div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div id="executive-map"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Transactions -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Recent Transactions</h5>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>24 May 2023</td>
+                                            <td>AFGRI Maize Purchase</td>
+                                            <td class="text-success">+R 142,800</td>
+                                            <td><span class="status-badge status-approved">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>23 May 2023</td>
+                                            <td>JHB Market Baby Marrow</td>
+                                            <td class="text-success">+R 28,450</td>
+                                            <td><span class="status-badge status-approved">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>22 May 2023</td>
+                                            <td>Luscious Allure - 50 Bottles</td>
+                                            <td class="text-success">+R 12,500</td>
+                                            <td><span class="status-badge status-approved">Paid</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>21 May 2023</td>
+                                            <td>Tiger Feeds Contract</td>
+                                            <td class="text-success">+R 56,000</td>
+                                            <td><span class="status-badge status-pending">Clearing</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>20 May 2023</td>
+                                            <td>Logistics - DSV Trucks</td>
+                                            <td class="text-danger">-R 32,500</td>
+                                            <td><span class="status-badge status-approved">Paid</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team Activity -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Team Activity</h5>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Manage Team</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex mb-4">
+                                <img src="https://randomuser.me/api/portraits/women/45.jpg" class="avatar me-3">
+                                <div>
+                                    <h6 class="mb-0">Lerato Mokoena</h6>
+                                    <small class="text-muted">Procurement Manager</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-primary">SJ Solutions</span>
+                                        <small class="text-muted ms-2">Updated 12 farmer contracts</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-4">
+                                <img src="https://randomuser.me/api/portraits/men/65.jpg" class="avatar me-3">
+                                <div>
+                                    <h6 class="mb-0">Thabo Nkosi</h6>
+                                    <small class="text-muted">Logistics Coordinator</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-success">Raseropo Fresh</span>
+                                        <small class="text-muted ms-2">Scheduled 5 deliveries</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-4">
+                                <img src="https://randomuser.me/api/portraits/women/32.jpg" class="avatar me-3">
+                                <div>
+                                    <h6 class="mb-0">Nomsa Khumalo</h6>
+                                    <small class="text-muted">Quality Control</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-primary">SJ Solutions</span>
+                                        <small class="text-muted ms-2">Approved 3 SGS certifications</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" class="avatar me-3">
+                                <div>
+                                    <h6 class="mb-0">James Peterson</h6>
+                                    <small class="text-muted">Sales Executive</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-danger">Luscious Allure</span>
+                                        <small class="text-muted ms-2">Recruited 3 new agents</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipment Tracking Page -->
+        <div class="container-fluid" id="shipments-page" style="display: none;">
+            <div class="card executive-card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Shipment Tracking</h5>
+                    <button class="btn btn-sm btn-primary" onclick="addNewShipment()">
+                        <i class="mdi mdi-plus"></i> New Shipment
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="shipments-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Origin</th>
+                                    <th>Destination</th>
+                                    <th>Carrier</th>
+                                    <th>Status</th>
+                                    <th>ETA</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#SJ-2305-142</td>
+                                    <td>Limpopo Farm</td>
+                                    <td>Johannesburg</td>
+                                    <td>DSV</td>
+                                    <td><span class="status-badge status-in-transit">In Transit</span></td>
+                                    <td>26 May 2023</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="mdi mdi-map-marker-path"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#RF-2305-087</td>
+                                    <td>Pretoria Warehouse</td>
+                                    <td>Durban Port</td>
+                                    <td>Unitrans</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                    <td>28 May 2023</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="mdi mdi-map-marker-path"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#LA-2305-001</td>
+                                    <td>Cape Town</td>
+                                    <td>Johannesburg</td>
+                                    <td>FedEx</td>
+                                    <td><span class="status-badge status-approved">Delivered</span></td>
+                                    <td>20 May 2023</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="mdi mdi-map-marker-path"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Live Shipment Tracking</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="shipment-map" style="height: 400px; border-radius: 10px; background-color: #f5f5f5;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Shipment Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>#SJ-2305-142</h6>
+                                <p class="text-muted">White Maize (25T)</p>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Carrier</small>
+                                <p>DSV Logistics</p>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Driver</small>
+                                <p>Thomas Mbeki</p>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Current Location</small>
+                                <p>N1 Highway, near Kroonstad</p>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Last Update</small>
+                                <p>25 May 2023, 14:32</p>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Estimated Arrival</small>
+                                <p>26 May 2023, 10:00</p>
+                            </div>
+                            <button class="btn btn-sm btn-primary w-100 mt-2">
+                                <i class="mdi mdi-phone"></i> Contact Driver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Overview Page -->
+        <div class="container-fluid" id="finance-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Financial Overview</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2" onclick="exportFinancials('pdf')">
+                                    <i class="mdi mdi-file-pdf"></i> PDF
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="exportFinancials('excel')">
+                                    <i class="mdi mdi-file-excel"></i> Excel
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <canvas id="financial-chart" height="250"></canvas>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-4">
+                                        <h6>Total Revenue</h6>
+                                        <h3 class="text-success">R 452,070</h3>
+                                        <small class="text-muted">14.2% increase from last month</small>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>Total Expenses</h6>
+                                        <h3 class="text-danger">R 187,230</h3>
+                                        <small class="text-muted">8.7% increase from last month</small>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6>Net Profit</h6>
+                                        <h3 class="text-primary">R 264,840</h3>
+                                        <small class="text-muted">18.5% profit margin</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Income by Business Unit</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="income-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Expense Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="expense-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Management Page -->
+        <div class="container-fluid" id="team-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Team Management</h5>
+                            <button class="btn btn-sm btn-primary" onclick="showAddTeamMember()">
+                                <i class="mdi mdi-plus"></i> Add Member
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="team-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Business Unit</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://randomuser.me/api/portraits/women/45.jpg" class="avatar me-3">
+                                                    <div>
+                                                        <h6 class="mb-0">Lerato Mokoena</h6>
+                                                        <small class="text-muted">ID: EMP-001</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Procurement Manager</td>
+                                            <td><span class="badge bg-primary">SJ Solutions</span></td>
+                                            <td>lerato@trgroup.co.za</td>
+                                            <td><span class="status-badge status-approved">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="mdi mdi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary">
+                                                    <i class="mdi mdi-pencil"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://randomuser.me/api/portraits/men/65.jpg" class="avatar me-3">
+                                                    <div>
+                                                        <h6 class="mb-0">Thabo Nkosi</h6>
+                                                        <small class="text-muted">ID: EMP-002</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Logistics Coordinator</td>
+                                            <td><span class="badge bg-success">Raseropo Fresh</span></td>
+                                            <td>thabo@trgroup.co.za</td>
+                                            <td><span class="status-badge status-approved">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="mdi mdi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary">
+                                                    <i class="mdi mdi-pencil"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://randomuser.me/api/portraits/men/75.jpg" class="avatar me-3">
+                                                    <div>
+                                                        <h6 class="mb-0">James Peterson</h6>
+                                                        <small class="text-muted">ID: EMP-003</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Sales Executive</td>
+                                            <td><span class="badge bg-danger">Luscious Allure</span></td>
+                                            <td>james@trgroup.co.za</td>
+                                            <td><span class="status-badge status-approved">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="mdi mdi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary">
+                                                    <i class="mdi mdi-pencil"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Team Structure</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="org-chart" style="height: 300px; background-color: #f5f5f5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <p class="text-muted">Organization chart visualization will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Upcoming Birthdays</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex mb-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                                    <i class="mdi mdi-cake-variant text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Lerato Mokoena</h6>
+                                    <small class="text-muted">June 15 (Next month)</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="bg-success bg-opacity-10 p-2 rounded me-3">
+                                    <i class="mdi mdi-cake-variant text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Thabo Nkosi</h6>
+                                    <small class="text-muted">July 3 (2 months)</small>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <div class="bg-danger bg-opacity-10 p-2 rounded me-3">
+                                    <i class="mdi mdi-cake-variant text-danger"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">James Peterson</h6>
+                                    <small class="text-muted">September 22 (4 months)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Units Page -->
+        <div class="container-fluid" id="units-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">SJ Solutions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <img src="https://via.placeholder.com/150x80?text=SJ+Solutions" class="img-fluid mb-3" style="max-height: 80px;">
+                            </div>
+                            <p class="card-text">Agricultural logistics and commodity trading specializing in maize distribution across Southern Africa.</p>
+                            <div class="mb-3">
+                                <small class="text-muted">Key Metrics</small>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Monthly Revenue</span>
+                                    <strong>R 284,750</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Active Contracts</span>
+                                    <strong>12</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Team Members</span>
+                                    <strong>8</strong>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary w-100">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Raseropo Fresh</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <img src="https://via.placeholder.com/150x80?text=Raseropo+Fresh" class="img-fluid mb-3" style="max-height: 80px;">
+                            </div>
+                            <p class="card-text">Premium fresh produce cultivation and distribution with focus on baby marrow and specialty crops.</p>
+                            <div class="mb-3">
+                                <small class="text-muted">Key Metrics</small>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Monthly Revenue</span>
+                                    <strong>R 98,420</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Active Farms</span>
+                                    <strong>3</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Team Members</span>
+                                    <strong>5</strong>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success w-100">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Luscious Allure</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <img src="https://via.placeholder.com/150x80?text=Luscious+Allure" class="img-fluid mb-3" style="max-height: 80px;">
+                            </div>
+                            <p class="card-text">Luxury fragrance brand with premium colognes sold through agent network at R250 per 100ml bottle.</p>
+                            <div class="mb-3">
+                                <small class="text-muted">Key Metrics</small>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Monthly Revenue</span>
+                                    <strong>R 68,900</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Active Agents</span>
+                                    <strong>14</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span>Bottles Sold</span>
+                                    <strong>275</strong>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger w-100">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Performance Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="units-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Luscious Allure Page -->
+        <div class="container-fluid" id="luscious-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Luscious Allure Dashboard</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2" onclick="showAddBatch()">
+                                    <i class="mdi mdi-plus"></i> New Batch
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="showAddAgent()">
+                                    <i class="mdi mdi-account-plus"></i> Add Agent
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="card executive-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="text-muted mb-2">Total Revenue</h6>
+                                                    <h3 class="mb-0">R 68,900</h3>
+                                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 22.1% growth</small>
+                                                </div>
+                                                <div class="bg-danger bg-opacity-10 p-3 rounded">
+                                                    <i class="mdi mdi-currency-usd mdi-24px text-danger"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card executive-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="text-muted mb-2">Bottles Sold</h6>
+                                                    <h3 class="mb-0">275</h3>
+                                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 18% growth</small>
+                                                </div>
+                                                <div class="bg-danger bg-opacity-10 p-3 rounded">
+                                                    <i class="mdi mdi-bottle-tonic-outline mdi-24px text-danger"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card executive-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="text-muted mb-2">Active Agents</h6>
+                                                    <h3 class="mb-0">14</h3>
+                                                    <small class="text-success"><i class="mdi mdi-arrow-up"></i> 2 new this month</small>
+                                                </div>
+                                                <div class="bg-danger bg-opacity-10 p-3 rounded">
+                                                    <i class="mdi mdi-account-group mdi-24px text-danger"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="mb-3">Sales Performance</h5>
+                                <canvas id="luscious-sales-chart" height="150"></canvas>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Top Agents</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Agent</th>
+                                                    <th>Sales</th>
+                                                    <th>Commission</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Sarah Johnson</td>
+                                                    <td>48 bottles</td>
+                                                    <td>R 1,680</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>David Wilson</td>
+                                                    <td>35 bottles</td>
+                                                    <td>R 1,225</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Emma Brown</td>
+                                                    <td>28 bottles</td>
+                                                    <td>R 980</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Recent Production</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Batch #</th>
+                                                    <th>Date</th>
+                                                    <th>Qty</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>LA-2305-01</td>
+                                                    <td>20 May 2023</td>
+                                                    <td>120</td>
+                                                    <td><span class="status-badge status-approved">Ready</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>LA-2304-03</td>
+                                                    <td>15 Apr 2023</td>
+                                                    <td>80</td>
+                                                    <td><span class="status-badge status-approved">Shipped</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>LA-2304-02</td>
+                                                    <td>5 Apr 2023</td>
+                                                    <td>100</td>
+                                                    <td><span class="status-badge status-approved">Sold Out</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Business Model</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6>Cost Structure</h6>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Production Cost per Bottle</small>
+                                    <strong>R 30</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Selling Price</small>
+                                    <strong>R 250</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Agent Commission (30%)</small>
+                                    <strong>R 75</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small>Net Profit per Bottle</small>
+                                    <strong>R 145</strong>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h6>Current Inventory</h6>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Ready for Sale</small>
+                                    <strong>85 bottles</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>In Production</small>
+                                    <strong>50 bottles</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small>Awaiting Materials</small>
+                                    <strong>30 bottles</strong>
+                                </div>
+                            </div>
+                            <div>
+                                <h6>Quick Actions</h6>
+                                <button class="btn btn-sm btn-outline-danger w-100 mb-2">
+                                    <i class="mdi mdi-email-fast"></i> Email Agents
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger w-100 mb-2">
+                                    <i class="mdi mdi-printer"></i> Print Labels
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger w-100">
+                                    <i class="mdi mdi-calculator"></i> Calculate ROI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Page -->
+        <div class="container-fluid" id="documents-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Contracts & Documents</h5>
+                            <button class="btn btn-sm btn-primary" onclick="showUploadDocument()">
+                                <i class="mdi mdi-upload"></i> Upload Document
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="documents-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Document Name</th>
+                                            <th>Type</th>
+                                            <th>Business Unit</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>AFGRI Maize Contract 2023</td>
+                                            <td>Contract</td>
+                                            <td>SJ Solutions</td>
+                                            <td>15 Jan 2023</td>
+                                            <td><span class="status-badge status-approved">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="mdi mdi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1">
+                                                    <i class="mdi mdi-download"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>DSV Logistics Agreement</td>
+                                            <td>Agreement</td>
+                                            <td>SJ Solutions</td>
+                                            <td>22 Mar 2023</td>
+                                            <td><span class="status-badge status-approved">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="mdi mdi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1">
+                                                    <i class="mdi mdi-download"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Luscious Allure Trademark</td>
+                                            <td>Legal</td>
+                                            <td>Luscious Allure</td>
+                                            <td>5 Feb 2023</td>
+                                            <td><span class="status-badge status-approved">Approved</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="mdi mdi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1">
+                                                    <i class="mdi mdi-download"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Document Categories</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    Contracts
+                                    <span class="badge bg-primary rounded-pill">12</span>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    Legal Documents
+                                    <span class="badge bg-primary rounded-pill">8</span>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    Financial Reports
+                                    <span class="badge bg-primary rounded-pill">15</span>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    HR Documents
+                                    <span class="badge bg-primary rounded-pill">5</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Upcoming Renewals</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex mb-3">
+                                <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
+                                    <i class="mdi mdi-alert-circle text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">DSV Logistics Agreement</h6>
+                                    <small class="text-muted">Expires on June 30, 2023 (1 month)</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
+                                    <i class="mdi mdi-alert-circle text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Johannesburg Warehouse Lease</h6>
+                                    <small class="text-muted">Expires on August 15, 2023 (3 months)</small>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
+                                    <i class="mdi mdi-alert-circle text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Limpopo Farm Contract</h6>
+                                    <small class="text-muted">Expires on December 5, 2023 (7 months)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accounting Page -->
+        <div class="container-fluid" id="accounting-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Accounting Overview</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2" onclick="generateInvoice()">
+                                    <i class="mdi mdi-file-document"></i> New Invoice
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="runFinancialReport()">
+                                    <i class="mdi mdi-file-chart"></i> Financial Report
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-4">
+                                        <h5>Cash Flow</h5>
+                                        <canvas id="cashflow-chart" height="200"></canvas>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h5>Recent Transactions</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Description</th>
+                                                        <th>Category</th>
+                                                        <th>Amount</th>
+                                                        <th>Balance</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>24 May 2023</td>
+                                                        <td>AFGRI Maize Purchase</td>
+                                                        <td>Income</td>
+                                                        <td class="text-success">+R 142,800</td>
+                                                        <td>R 452,070</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>23 May 2023</td>
+                                                        <td>JHB Market Baby Marrow</td>
+                                                        <td>Income</td>
+                                                        <td class="text-success">+R 28,450</td>
+                                                        <td>R 309,270</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>22 May 2023</td>
+                                                        <td>Farmer Payments</td>
+                                                        <td>Expense</td>
+                                                        <td class="text-danger">-R 89,200</td>
+                                                        <td>R 280,820</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>21 May 2023</td>
+                                                        <td>Tiger Feeds Contract</td>
+                                                        <td>Income</td>
+                                                        <td class="text-success">+R 56,000</td>
+                                                        <td>R 370,020</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card executive-card">
+                                        <div class="card-header bg-white">
+                                            <h6 class="mb-0">Quick Stats</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <small class="text-muted">Current Balance</small>
+                                                <h3 class="text-success">R 452,070</h3>
+                                            </div>
+                                            <div class="mb-3">
+                                                <small class="text-muted">Accounts Receivable</small>
+                                                <h4>R 68,400</h4>
+                                            </div>
+                                            <div class="mb-3">
+                                                <small class="text-muted">Accounts Payable</small>
+                                                <h4>R 42,750</h4>
+                                            </div>
+                                            <div class="mb-3">
+                                                <small class="text-muted">Tax Liability</small>
+                                                <h4>R 37,820</h4>
+                                            </div>
+                                            <button class="btn btn-sm btn-primary w-100 mt-2">
+                                                <i class="mdi mdi-bank"></i> Reconcile Accounts
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card executive-card mt-3">
+                                        <div class="card-header bg-white">
+                                            <h6 class="mb-0">Expense Categories</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="expense-categories-chart" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div class="container-fluid" id="reports-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Report Templates</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="card template-card h-100" onclick="generateReport('financial')">
+                                        <div class="card-body text-center">
+                                            <div class="bg-primary bg-opacity-10 p-3 rounded d-inline-block mb-3">
+                                                <i class="mdi mdi-finance text-primary mdi-36px"></i>
+                                            </div>
+                                            <h6>Financial Statement</h6>
+                                            <small class="text-muted">Monthly P&L report</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card template-card h-100" onclick="generateReport('invoice')">
+                                        <div class="card-body text-center">
+                                            <div class="bg-success bg-opacity-10 p-3 rounded d-inline-block mb-3">
+                                                <i class="mdi mdi-file-document text-success mdi-36px"></i>
+                                            </div>
+                                            <h6>Customer Invoice</h6>
+                                            <small class="text-muted">Luscious Allure</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card template-card h-100" onclick="generateReport('shipment')">
+                                        <div class="card-body text-center">
+                                            <div class="bg-warning bg-opacity-10 p-3 rounded d-inline-block mb-3">
+                                                <i class="mdi mdi-truck-delivery text-warning mdi-36px"></i>
+                                            </div>
+                                            <h6>Shipment Manifest</h6>
+                                            <small class="text-muted">SJ Solutions</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card template-card h-100" onclick="generateReport('commission')">
+                                        <div class="card-body text-center">
+                                            <div class="bg-danger bg-opacity-10 p-3 rounded d-inline-block mb-3">
+                                                <i class="mdi mdi-account-cash text-danger mdi-36px"></i>
+                                            </div>
+                                            <h6>Agent Commission</h6>
+                                            <small class="text-muted">Luscious Allure</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Recent Reports</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">May Financial Statement</h6>
+                                        <small class="text-muted">Generated 25 May 2023</small>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="mdi mdi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="mdi mdi-email"></i>
+                                        </button>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Luscious Allure Agent Commissions</h6>
+                                        <small class="text-muted">Generated 20 May 2023</small>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="mdi mdi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="mdi mdi-email"></i>
+                                        </button>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Q1 Tax Report</h6>
+                                        <small class="text-muted">Generated 5 Apr 2023</small>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="mdi mdi-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="mdi mdi-email"></i>
+                                        </button>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Custom Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Report Type</label>
+                                    <select class="form-select">
+                                        <option>Financial Summary</option>
+                                        <option>Sales Report</option>
+                                        <option>Expense Report</option>
+                                        <option>Inventory Report</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Date Range</label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control">
+                                        <span class="input-group-text">to</span>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Business Unit</label>
+                                    <select class="form-select">
+                                        <option>All Units</option>
+                                        <option>SJ Solutions</option>
+                                        <option>Raseropo Fresh</option>
+                                        <option>Luscious Allure</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Format</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="format" id="pdf-format" checked>
+                                            <label class="form-check-label" for="pdf-format">PDF</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="format" id="excel-format">
+                                            <label class="form-check-label" for="excel-format">Excel</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="mdi mdi-file-chart"></i> Generate Report
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Page -->
+        <div class="container-fluid" id="calendar-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card executive-card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Executive Calendar</h5>
+                            <button class="btn btn-sm btn-primary" onclick="showAddEvent()">
+                                <i class="mdi mdi-plus"></i> Add Event
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="calendar" style="height: 600px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communications Page -->
+        <div class="container-fluid" id="comms-page" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Contacts</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
+                                <input type="text" class="form-control" placeholder="Search contacts...">
+                            </div>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action active">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Tumelo Raseropo</h6>
+                                            <small>CEO</small>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/women/45.jpg" class="avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Lerato Mokoena</h6>
+                                            <small>Procurement Manager</small>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/men/65.jpg" class="avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Thabo Nkosi</h6>
+                                            <small>Logistics Coordinator</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card executive-card h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Messages</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">Conversation with Lerato Mokoena</h6>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="mdi mdi-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="#">Mark as unread</a></li>
+                                            <li><a class="dropdown-item" href="#">Delete conversation</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 overflow-auto mb-3" style="max-height: 400px;">
+                                <div class="d-flex mb-3">
+                                    <img src="https://randomuser.me/api/portraits/women/45.jpg" class="avatar me-3">
+                                    <div>
+                                        <div class="bg-light p-3 rounded">
+                                            <p class="mb-0">Hi Tumelo, just wanted to confirm we've secured the maize contract with AFGRI. The paperwork is ready for your signature.</p>
+                                        </div>
+                                        <small class="text-muted">Yesterday, 14:32</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-3 flex-row-reverse">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="avatar ms-3">
+                                    <div>
+                                        <div class="bg-primary text-white p-3 rounded">
+                                            <p class="mb-0">Great news Lerato! I'll stop by the office tomorrow morning to sign.</p>
+                                        </div>
+                                        <small class="text-muted d-block text-end">Yesterday, 15:45</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <img src="https://randomuser.me/api/portraits/women/45.jpg" class="avatar me-3">
+                                    <div>
+                                        <div class="bg-light p-3 rounded">
+                                            <p class="mb-0">Perfect. Also, the DSV trucks are scheduled for the Limpopo pickup on Thursday.</p>
+                                        </div>
+                                        <small class="text-muted">Today, 08:15</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-top pt-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Type your message...">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="mdi mdi-send"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Settings</h5>
+                <button class="btn btn-sm btn-outline-secondary" onclick="hideSettings()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <ul class="nav nav-tabs mb-3" id="settings-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="business-tab" data-bs-toggle="tab" data-bs-target="#business" type="button" role="tab">Business</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">Notifications</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="settings-tabs-content">
+                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Profile Picture</label>
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="avatar me-3" id="profile-picture">
+                                <div>
+                                    <input type="file" class="form-control" id="profile-picture-upload">
+                                    <small class="text-muted">JPG, PNG or GIF (Max 2MB)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="Tumelo Raseropo">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="tumelo@trgroup.co.za">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" value="+27 82 123 4567">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="business" role="tabpanel">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Company Logo</label>
+                            <div class="d-flex align-items-center">
+                                <img src="https://via.placeholder.com/150x50?text=TR+Group" class="img-fluid me-3" style="max-height: 50px;" id="company-logo-preview">
+                                <div>
+                                    <input type="file" class="form-control" id="company-logo-upload">
+                                    <small class="text-muted">PNG or SVG (Max 2MB)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" value="TR Group Holdings">
+                        </div>
+                        <div class="mb-3">
+                            <h6>Business Units</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Color</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" value="SJ Solutions">
+                                            </td>
+                                            <td>
+                                                <input type="color" class="form-control form-control-color" value="#2e7d32" title="Choose color">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" value="Raseropo Fresh">
+                                            </td>
+                                            <td>
+                                                <input type="color" class="form-control form-control-color" value="#4caf50" title="Choose color">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" value="Luscious Allure">
+                                            </td>
+                                            <td>
+                                                <input type="color" class="form-control form-control-color" value="#6a1b9a" title="Choose color">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="mdi mdi-plus"></i> Add Business Unit
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Luscious Allure Settings</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Production Cost per Bottle (R)</label>
+                                    <input type="number" class="form-control" value="30">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Selling Price (R)</label>
+                                    <input type="number" class="form-control" value="250">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Agent Commission (%)</label>
+                                    <input type="number" class="form-control" value="30">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="notifications" role="tabpanel">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Notification Preferences</label>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="email-notifications" checked>
+                                <label class="form-check-label" for="email-notifications">Email Notifications</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="push-notifications" checked>
+                                <label class="form-check-label" for="push-notifications">Push Notifications</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="sms-notifications">
+                                <label class="form-check-label" for="sms-notifications">SMS Notifications</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notification Types</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="shipment-notifications" checked>
+                                <label class="form-check-label" for="shipment-notifications">Shipment Updates</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="payment-notifications" checked>
+                                <label class="form-check-label" for="payment-notifications">Payment Alerts</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="meeting-notifications" checked>
+                                <label class="form-check-label" for="meeting-notifications">Meeting Reminders</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="report-notifications">
+                                <label class="form-check-label" for="report-notifications">Report Ready</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <script>
+        // Initialize Google Map
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById("executive-map"), {
+                center: { lat: -28.4793, lng: 24.6727 }, // Centered on South Africa
+                zoom: 5,
+                styles: [
+                    {
+                        "featureType": "administrative",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#444444"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "landscape",
+                        "elementType": "all",
+                        "stylers": [
+                            {
+                                "color": "#f2f2f2"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "all",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "all",
+                        "stylers": [
+                            {
+                                "saturation": -100
+                            },
+                            {
+                                "lightness": 45
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "all",
+                        "stylers": [
+                            {
+                                "visibility": "simplified"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "labels.icon",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "transit",
+                        "elementType": "all",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "all",
+                        "stylers": [
+                            {
+                                "color": "#46bcec"
+                            },
+                            {
+                                "visibility": "on"
+                            }
+                        ]
+                    }
+                ]
+            });
+            
+            // Business locations
+            const locations = [
+                { lat: -26.2041, lng: 28.0473, title: "Johannesburg HQ", type: "hq" },
+                { lat: -23.685, lng: 27.908, title: "Limpopo Farm", type: "farm" },
+                { lat: -25.8589, lng: 28.1854, title: "Pretoria Office", type: "office" },
+                { lat: -29.8579, lng: 31.0292, title: "Durban Port", type: "port" },
+                { lat: -25.7479, lng: 28.2293, title: "Centurion Warehouse", type: "warehouse" }
+            ];
+            
+            locations.forEach(loc => {
+                let icon;
+                if (loc.type === "hq") {
+                    icon = {
+                        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    };
+                } else if (loc.type === "farm") {
+                    icon = {
+                        url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    };
+                } else {
+                    icon = {
+                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    };
+                }
+                
+                new google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map: map,
+                    title: loc.title,
+                    icon: icon
+                });
+            });
+        }
+        
+        // Initialize Charts
+        function initCharts() {
+            // Financial Chart
+            const financialCtx = document.getElementById('financial-chart').getContext('2d');
+            const financialChart = new Chart(financialCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: [320000, 350000, 380000, 400000, 452070],
+                            borderColor: '#4caf50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [180000, 190000, 210000, 200000, 187230],
+                            borderColor: '#f44336',
+                            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Income Chart
+            const incomeCtx = document.getElementById('income-chart').getContext('2d');
+            const incomeChart = new Chart(incomeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['SJ Solutions', 'Raseropo Fresh', 'Luscious Allure'],
+                    datasets: [{
+                        data: [284750, 98420, 68900],
+                        backgroundColor: [
+                            '#2e7d32',
+                            '#4caf50',
+                            '#6a1b9a'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += 'R ' + context.raw.toLocaleString();
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Expense Chart
+            const expenseCtx = document.getElementById('expense-chart').getContext('2d');
+            const expenseChart = new Chart(expenseCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Logistics', 'Salaries', 'Materials', 'Utilities', 'Other'],
+                    datasets: [{
+                        label: 'Expenses',
+                        data: [85000, 65000, 22000, 12000, 3230],
+                        backgroundColor: [
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(244, 67, 54, 0.7)'
+                        ],
+                        borderColor: [
+                            '#f44336',
+                            '#f44336',
+                            '#f44336',
+                            '#f44336',
+                            '#f44336'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'R ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Business Units Chart
+            const unitsCtx = document.getElementById('units-chart').getContext('2d');
+            const unitsChart = new Chart(unitsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Revenue', 'Profit', 'Growth', 'Efficiency', 'Market Share'],
+                    datasets: [
+                        {
+                            label: 'SJ Solutions',
+                            data: [85, 75, 80, 70, 65],
+                            backgroundColor: 'rgba(46, 125, 50, 0.2)',
+                            borderColor: '#2e7d32',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#2e7d32'
+                        },
+                        {
+                            label: 'Raseropo Fresh',
+                            data: [65, 60, 70, 55, 50],
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            borderColor: '#4caf50',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#4caf50'
+                        },
+                        {
+                            label: 'Luscious Allure',
+                            data: [50, 70, 60, 65, 40],
+                            backgroundColor: 'rgba(106, 27, 154, 0.2)',
+                            borderColor: '#6a1b9a',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#6a1b9a'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+            
+            // Luscious Sales Chart
+            const lusciousCtx = document.getElementById('luscious-sales-chart').getContext('2d');
+            const lusciousChart = new Chart(lusciousCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                    datasets: [{
+                        label: 'Bottles Sold',
+                        data: [120, 150, 180, 210, 275],
+                        backgroundColor: 'rgba(106, 27, 154, 0.7)',
+                        borderColor: '#6a1b9a',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Cashflow Chart
+            const cashflowCtx = document.getElementById('cashflow-chart').getContext('2d');
+            const cashflowChart = new Chart(cashflowCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [
+                        {
+                            label: 'Incoming',
+                            data: [120000, 150000, 180000, 200000],
+                            borderColor: '#4caf50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Outgoing',
+                            data: [80000, 90000, 95000, 85000],
+                            borderColor: '#f44336',
+                            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Expense Categories Chart
+            const expenseCatCtx = document.getElementById('expense-categories-chart').getContext('2d');
+            const expenseCatChart = new Chart(expenseCatCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Logistics', 'Salaries', 'Materials', 'Utilities', 'Other'],
+                    datasets: [{
+                        data: [45, 35, 12, 6, 2],
+                        backgroundColor: [
+                            '#f44336',
+                            '#ff9800',
+                            '#2196f3',
+                            '#4caf50',
+                            '#9e9e9e'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Navigation Functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.container-fluid[id$="-page"]').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + '-page').style.display = 'block';
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item-exec').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.nav-item-exec[data-page="${pageId}"]`).classList.add('active');
+            
+            // Initialize charts if on financial page
+            if (pageId === 'finance') {
+                initCharts();
+            }
+        }
+        
+        // Settings Panel
+        function showSettings() {
+            document.getElementById('settings-panel').style.display = 'block';
+        }
+        
+        function hideSettings() {
+            document.getElementById('settings-panel').style.display = 'none';
+        }
+        
+        // Report Generation
+        function generateReport(type) {
+            let reportName = '';
+            switch(type) {
+                case 'financial':
+                    reportName = 'Financial Statement';
+                    break;
+                case 'invoice':
+                    reportName = 'Customer Invoice';
+                    break;
+                case 'shipment':
+                    reportName = 'Shipment Manifest';
+                    break;
+                case 'commission':
+                    reportName = 'Agent Commission';
+                    break;
+                default:
+                    reportName = 'Report';
+            }
+            
+            alert(`Generating ${reportName}... This would export as PDF/Excel in a real application.`);
+        }
+        
+        // Initialize DataTables
+        function initDataTables() {
+            $('#shipments-table').DataTable();
+            $('#team-table').DataTable();
+            $('#documents-table').DataTable();
+        }
+        
+        // Sample interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize components
+            initCharts();
+            initDataTables();
+            
+            // Set dashboard as default page
+            showPage('dashboard');
+            
+            // Simulate loading data
+            setTimeout(() => {
+                const loadingElements = document.querySelectorAll('.card-body');
+                loadingElements.forEach(el => {
+                    el.style.opacity = '1';
+                });
+            }, 500);
+            
+            // Handle sidebar navigation
+            document.querySelectorAll('.nav-item-exec').forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    showPage(pageId);
+                });
+            });
+            
+            // Handle profile picture upload
+            document.getElementById('profile-picture-upload').addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('profile-picture').src = event.target.result;
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+            
+            // Handle company logo upload
+            document.getElementById('company-logo-upload').addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('company-logo-preview').src = event.target.result;
+                        document.getElementById('company-logo').src = event.target.result;
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
